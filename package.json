@@ -1,0 +1,14 @@
+{
+  "name": "urshortener",
+  "version": "1.0.0",
+  "description": "urlshortener",
+  "main": "index.js",
+  "scripts": {
+    "serve": "concurrently 'cd front && npm run serve' 'cd back && npm run start' "
+  },
+  "author": "Galileo Teco",
+  "license": "ISC",
+  "devDependencies": {
+    "concurrently": "^5.3.0"
+  }
+}
