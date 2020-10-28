@@ -5,3 +5,5 @@ exports.MongoSettings = {
     dbName: process.env.MONGO_DBNAME,
     collection: process.env.MONGO_COLLECTION
 }
+
+exports.lengthUrlCode = process.env.LENGTH_URL_CODE || 10;

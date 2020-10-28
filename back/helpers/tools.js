@@ -1,4 +1,4 @@
-exports.getCodeUrl = function (length) {
+exports.getUrlCode = function (length) {
     var result = '';
     var characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
     var charactersLength = characters.length;
