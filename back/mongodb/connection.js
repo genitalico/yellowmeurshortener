@@ -28,7 +28,6 @@ exports.connection = function (app, opts) {
                 req['mdb'] = {
                     collection: settings.MongoSettings.collection
                 };
-                req.mdb.transactions.Db(db, req.mdb);
                 app.set("mongodb", db);
                 next();
             })
