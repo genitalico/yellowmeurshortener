@@ -4,7 +4,7 @@ const adminTransaction = require('../transactions/adminTransaction');
 const adminBinding = require('../models/adminBinding');
 var multer = require('multer')
 var upload = multer({ dest: 'uploads/' })
-
+const baseBinding = require('../models/baseBinding');
 
 /* GET home page. */
 router.get('/', function (req, res, next) {
@@ -22,25 +22,22 @@ router.post('/newurl', async function (req, res, next) {
 
         const validModel = await adminBinding.newUrlPostSchema.validateAsync(body);
 
-        result = await adminTransaction.createNewUrlCode(validModel.url, req.mdb);
+        let result = await adminTransaction.createNewUrlCode(validModel.url, req.mdb);
 
-        if (!result.err) {
-            res.status(200);
-            res.json(result);
-            res.end();
-        }
-        else {
-            res.status(200);
-            res.json();
-            res.end();
-        }
+        res.status(200);
+        res.json(result);
+        res.end();
     }
     catch (err) {
 
         console.log(err);
+        let data = {
+            type: 3
+        }
+        let result = new baseBinding.resultTransaction(true, data);
 
         res.status(200);
-        res.json(err);
+        res.json(result);
         res.end();
     }
 
@@ -50,11 +47,8 @@ router.post('/bulkUrl', upload.single('file'), async function (req, res, next) {
 
     let result = await adminTransaction.uploadBulk(req.file.path, req.mdb);
 
-
-
     res.status(200);
-    if (result.err)
-        res.json(result);
+    res.json(result);
     res.end();
 });
 

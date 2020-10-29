@@ -69,7 +69,18 @@ exports.uploadBulk = async function (pathFile, mongodb) {
 
         let resultSaveBulk = await mongodb.transactions.saveBulkUrls(urlsToSave);
 
-        return resultSaveBulk;
+        let data = resultSaveBulk.data.ops;
+
+        for(let i=0;i<data.length;i++){
+
+            delete data[i].obj;
+            delete data[i].created_date;
+            delete data[i]._id;   
+        }
+
+        let resultTransaction = new baseBinding.resultTransaction(false, data);
+
+        return resultTransaction;
     }
 
     //invalidReadFile
