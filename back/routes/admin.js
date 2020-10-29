@@ -2,6 +2,9 @@ var express = require('express');
 var router = express.Router();
 const adminTransaction = require('../transactions/adminTransaction');
 const adminBinding = require('../models/adminBinding');
+var multer = require('multer')
+var upload = multer({ dest: 'uploads/' })
+
 
 /* GET home page. */
 router.get('/', function (req, res, next) {
@@ -19,7 +22,7 @@ router.post('/newurl', async function (req, res, next) {
 
         const validModel = await adminBinding.newUrlPostSchema.validateAsync(body);
 
-        result = await adminTransaction.createNewUrlCode(validModel.url,req.mdb);
+        result = await adminTransaction.createNewUrlCode(validModel.url, req.mdb);
 
         if (!result.err) {
             res.status(200);
@@ -41,6 +44,18 @@ router.post('/newurl', async function (req, res, next) {
         res.end();
     }
 
+});
+
+router.post('/bulkUrl', upload.single('file'), async function (req, res, next) {
+
+    let result = await adminTransaction.uploadBulk(req.file.path);
+
+    
+
+    res.status(200);
+    if (result.err)
+        res.json(result.data);
+    res.end();
 });
 
 module.exports = router;
