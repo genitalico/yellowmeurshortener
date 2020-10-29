@@ -1,8 +1,7 @@
 var express = require('express');
 var router = express.Router();
+const adminTransaction = require('../transactions/adminTransaction');
 const adminBinding = require('../models/adminBinding');
-const tools = require('../helpers/tools');
-const settings = require('../appsettings');
 
 /* GET home page. */
 router.get('/', function (req, res, next) {
@@ -20,17 +19,22 @@ router.post('/newurl', async function (req, res, next) {
 
         const validModel = await adminBinding.newUrlPostSchema.validateAsync(body);
 
-        console.log(settings.lengthUrlCode);
+        result = await adminTransaction.createNewUrlCode(validModel.url,req.mdb);
 
-        const urlCode = tools.getUrlCode(settings.lengthUrlCode);
-
-        let response = new adminBinding.responseNewUrl(urlCode,validModel.url);
-
-        res.status(200);
-        res.json(response);
-        res.end();
+        if (!result.err) {
+            res.status(200);
+            res.json(result);
+            res.end();
+        }
+        else {
+            res.status(200);
+            res.json();
+            res.end();
+        }
     }
     catch (err) {
+
+        console.log(err);
 
         res.status(200);
         res.json(err);

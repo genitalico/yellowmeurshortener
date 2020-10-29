@@ -1,7 +1,7 @@
 var mongodb = require("mongodb");
 const settings = require("../appsettings");
 var client = mongodb.MongoClient;
-
+let dbTransactions = require('./transactions');
 
 exports.connection = function (app, opts) {
     opts = {
@@ -26,8 +26,10 @@ exports.connection = function (app, opts) {
                 let db = client.db(settings.MongoSettings.dbName);
                 req[property] = db;
                 req['mdb'] = {
-                    collection: settings.MongoSettings.collection
+                    collection: settings.MongoSettings.collection,
+                    transactions: dbTransactions
                 };
+                req.mdb.transactions.Db(db, req.mdb);
                 app.set("mongodb", db);
                 next();
             })
