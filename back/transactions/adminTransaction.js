@@ -5,9 +5,19 @@ const baseBinding = require('../models/baseBinding');
 
 exports.createNewUrlCode = async function (url, mongodb) {
 
-    const urlCode = tools.getUrlCode(settings.lengthUrlCode);
 
-    let saveUrlShortResult = await mongodb.transactions.saveUrlShort(urlCode, url);
+    let saveUrlShortResult = undefined;
+    let urlCode = '';
+
+    for (let i = 0; i < 2; i++) {
+
+        urlCode = tools.getUrlCode(settings.lengthUrlCode);
+
+        saveUrlShortResult = await mongodb.transactions.saveUrlShort(urlCode, url);
+
+        if (!saveUrlShortResult.err)
+            break;
+    }
 
     if (!saveUrlShortResult.err) {
 

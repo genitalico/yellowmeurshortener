@@ -5,9 +5,10 @@ exports.Db = function (db, mdb) {
         try {
 
             let document = {
-                short_code : urlCode,
+                short_code: urlCode,
                 url,
-                obj: 1
+                obj: 1,
+                created_date: new Date()
             };
 
             var result = await db.collection(mdb.collection).insertOne(document);
