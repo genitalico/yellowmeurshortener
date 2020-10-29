@@ -48,13 +48,13 @@ router.post('/newurl', async function (req, res, next) {
 
 router.post('/bulkUrl', upload.single('file'), async function (req, res, next) {
 
-    let result = await adminTransaction.uploadBulk(req.file.path);
+    let result = await adminTransaction.uploadBulk(req.file.path, req.mdb);
 
-    
+
 
     res.status(200);
     if (result.err)
-        res.json(result.data);
+        res.json(result);
     res.end();
 });
 

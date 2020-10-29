@@ -33,13 +33,14 @@ exports.createNewUrlCode = async function (url, mongodb) {
     return resultTransaction;
 }
 
-exports.uploadBulk = async function (pathFile) {
+exports.uploadBulk = async function (pathFile, mongodb) {
 
     var resultReadFile = await tools.readFileByLines(pathFile);
 
     if (!resultReadFile.err) {
 
-        let resultValidate = tools.validateBulkUrls(resultReadFile.data);
+        let urls = resultReadFile.data;
+        let resultValidate = tools.validateBulkUrls(urls);
 
         //invalid urls
         if (resultValidate.err) {
@@ -52,6 +53,23 @@ exports.uploadBulk = async function (pathFile) {
 
             return resultTransaction;
         }
+
+        let urlsToSave = [];
+
+        for (let i = 0; i < urls.length; i++) {
+
+
+            let urlCode = tools.getUrlCode(settings.lengthUrlCode);
+
+            urlsToSave.push({
+                short_code: urlCode,
+                url: urls[i]
+            });
+        }
+
+        let resultSaveBulk = await mongodb.transactions.saveBulkUrls(urlsToSave);
+
+        return resultSaveBulk;
     }
 
     //invalidReadFile

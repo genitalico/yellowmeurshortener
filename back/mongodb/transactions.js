@@ -24,4 +24,52 @@ exports.Db = function (db, mdb) {
             return resultTransaction;
         }
     }
+
+    this.saveBulkUrls = async function (urls) {
+
+        try {
+
+            let documents = [];
+
+            for (let i = 0; i < urls.length; i++) {
+
+                let document = {
+                    short_code: urls[i].short_code,
+                    url: urls[i].url,
+                    obj: 1,
+                    created_date: new Date()
+                };
+
+                documents.push(document);
+            }
+
+            var result = await db.collection(mdb.collection).insertMany(documents, { ordered: false });
+
+            let resultTransaction = new baseBinding.resultTransaction(false, result);
+
+            return resultTransaction;
+        }
+        catch (err) {
+
+            if (err.code == 11000) {
+
+                let urlErrors = [];
+
+                for (let i = 0; i < err.writeErrors.length; i++) {
+                    let url = err.writeErrors[i].err.op.url;
+
+                    urlErrors.push(url);
+                }
+
+                let data = {
+                    type: 11000,
+                    data: urlErrors
+                }
+
+                let resultTransaction = new baseBinding.resultTransaction(true, data);
+
+                return resultTransaction;
+            }
+        }
+    }
 }
