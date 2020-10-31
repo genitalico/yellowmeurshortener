@@ -92,3 +92,10 @@ exports.uploadBulk = async function (pathFile, mongodb) {
 
     return resultReadFile;
 }
+
+exports.findShortCode = async function(shortCode,mongodb){
+
+    let resultFind = await mongodb.transactions.findShortCode(shortCode);
+
+    return resultFind;
+}

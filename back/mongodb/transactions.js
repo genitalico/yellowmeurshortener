@@ -72,4 +72,39 @@ exports.Db = function (db, mdb) {
             }
         }
     }
+
+    this.findShortCode = async function (shortCode) {
+
+        try {
+
+            let query = {
+                $and: [
+                    { obj: 1 },
+                    { short_code: shortCode }
+                ]
+            }
+            let result = await db.collection(mdb.collection).findOne(query);
+
+            if (!result) {
+                let resultTransaction = new baseBinding.resultTransaction(true, {});
+
+                return resultTransaction;
+            }
+
+            let data = {
+                url: result.url
+            }
+
+            let resultTransaction = new baseBinding.resultTransaction(false, data);
+
+            return resultTransaction;
+
+        }
+        catch (err) {
+
+            let resultTransaction = new baseBinding.resultTransaction(true, {});
+
+            return resultTransaction;
+        }
+    }
 }
