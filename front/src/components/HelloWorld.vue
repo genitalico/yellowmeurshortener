@@ -38,13 +38,8 @@ export default {
   components:{
     TableUrl
   },
-  watch:{
-    showTableAdd : function(val){
-      console.log(val);
-    }
-  },
   mounted() {
-    console.log(process.env);
+    
   },
   data() {
     return {
