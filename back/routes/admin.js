@@ -24,20 +24,42 @@ router.post('/AddUrl', async function (req, res, next) {
 
         let result = await adminTransaction.createNewUrlCode(validModel.url, req.mdb);
 
+        if (!result.err) {
+            let response = {
+                code: 1002,
+                messages: ['Register Created'],
+                content: {
+                    short_url: result.data.url_code,
+                    url: validModel.url
+                }
+            }
+
+            res.status(200);
+            res.json(response);
+            res.end();
+            return;
+        }
+
+        let response = {
+            code: 1003,
+            messages: ['InternalError'],
+            content: {}
+        }
+
         res.status(200);
-        res.json(result);
+        res.json(response);
         res.end();
     }
     catch (err) {
 
-        console.log(err);
-        let data = {
-            type: 3
+        let response = {
+            code: 1003,
+            messages: ['InternalError'],
+            content: {}
         }
-        let result = new baseBinding.resultTransaction(true, data);
 
         res.status(200);
-        res.json(result);
+        res.json(response);
         res.end();
     }
 
