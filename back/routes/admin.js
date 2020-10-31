@@ -67,10 +67,58 @@ router.post('/AddUrl', async function (req, res, next) {
 
 router.post('/bulkUrl', upload.single('file'), async function (req, res, next) {
 
+    if (req.file == undefined) {
+
+        let response = {
+            code: 1000,
+            messages: ['Invalid Model'],
+            content: {}
+        }
+
+        res.status(200);
+        res.json(response);
+        res.end();
+        return;
+    }
+
+    if (req.file.mimetype != 'text/plain') {
+
+        let response = {
+            code: 1000,
+            messages: ['Invalid Model'],
+            content: {}
+        }
+
+        res.status(200);
+        res.json(response);
+        res.end();
+        return;
+
+    }
+
     let result = await adminTransaction.uploadBulk(req.file.path, req.mdb);
 
+    if (result.err) {
+        let response = {
+            code: 1003,
+            messages: ['Internal Error'],
+            content: {}
+        }
+
+        res.status(200);
+        res.json(response);
+        res.end();
+        return
+    }
+
+    let response = {
+        code: 1002,
+        messages: ['Register Created'],
+        content: result.data
+    }
+
     res.status(200);
-    res.json(result);
+    res.json(response);
     res.end();
 });
 
