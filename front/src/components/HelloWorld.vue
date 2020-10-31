@@ -1,58 +1,100 @@
 <template>
-  <div class="hello">
-    <h1>{{ msg }}</h1>
-    <p>
-      For a guide and recipes on how to configure / customize this project,<br>
-      check out the
-      <a href="https://cli.vuejs.org" target="_blank" rel="noopener">vue-cli documentation</a>.
-    </p>
-    <h3>Installed CLI Plugins</h3>
-    <ul>
-      <li><a href="https://github.com/vuejs/vue-cli/tree/dev/packages/%40vue/cli-plugin-babel" target="_blank" rel="noopener">babel</a></li>
-      <li><a href="https://github.com/vuejs/vue-cli/tree/dev/packages/%40vue/cli-plugin-eslint" target="_blank" rel="noopener">eslint</a></li>
-    </ul>
-    <h3>Essential Links</h3>
-    <ul>
-      <li><a href="https://vuejs.org" target="_blank" rel="noopener">Core Docs</a></li>
-      <li><a href="https://forum.vuejs.org" target="_blank" rel="noopener">Forum</a></li>
-      <li><a href="https://chat.vuejs.org" target="_blank" rel="noopener">Community Chat</a></li>
-      <li><a href="https://twitter.com/vuejs" target="_blank" rel="noopener">Twitter</a></li>
-      <li><a href="https://news.vuejs.org" target="_blank" rel="noopener">News</a></li>
-    </ul>
-    <h3>Ecosystem</h3>
-    <ul>
-      <li><a href="https://router.vuejs.org" target="_blank" rel="noopener">vue-router</a></li>
-      <li><a href="https://vuex.vuejs.org" target="_blank" rel="noopener">vuex</a></li>
-      <li><a href="https://github.com/vuejs/vue-devtools#vue-devtools" target="_blank" rel="noopener">vue-devtools</a></li>
-      <li><a href="https://vue-loader.vuejs.org" target="_blank" rel="noopener">vue-loader</a></li>
-      <li><a href="https://github.com/vuejs/awesome-vue" target="_blank" rel="noopener">awesome-vue</a></li>
-    </ul>
+  <div class="container">
+    <h1 class="text-center">{{ name }}</h1>
+    <div class="row">
+      <div class="col">
+        <b-input-group prepend="URL" class="mt-3">
+          <b-form-input v-model="inputUrl"></b-form-input>
+          <b-input-group-append>
+            <b-button variant="outline-success" v-on:click="newUrl()"
+              >Acortar</b-button
+            >
+          </b-input-group-append>
+        </b-input-group>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-6">
+        <h3>Nuevas</h3>
+        <div class="col"><TableUrl v-if="showTableAdd" v-bind:list="listUrls" /></div>
+      </div>
+      <div class="col-6">
+        <h3>Todas</h3>
+        <div class="col"><TableUrl v-if="showTableAdd" v-bind:list="listUrls" /></div>
+      </div>
+    </div>
   </div>
 </template>
 
 <script>
-export default {
-  name: 'HelloWorld',
-  props: {
-    msg: String
-  }
-}
-</script>
+import TableUrl from './TableUrls.vue'
 
-<!-- Add "scoped" attribute to limit CSS to this component only -->
-<style scoped>
-h3 {
-  margin: 40px 0 0;
-}
-ul {
-  list-style-type: none;
-  padding: 0;
-}
-li {
-  display: inline-block;
-  margin: 0 10px;
-}
-a {
-  color: #42b983;
-}
-</style>
+export default {
+  name: "HelloWorld",
+  props: {
+    msg: String,
+  },
+  components:{
+    TableUrl
+  },
+  watch:{
+    showTableAdd : function(val){
+      console.log(val);
+    }
+  },
+  mounted() {
+    console.log(process.env);
+  },
+  data() {
+    return {
+      name: "Url Shortener",
+      inputUrl: "",
+      urlShortener: "",
+      listUrls : '',
+      showTableAdd : false
+    };
+  },
+  methods: {
+    newUrl: async function () {
+      var myHeaders = new Headers();
+      myHeaders.append("Content-Type", "application/json");
+
+      var raw = JSON.stringify({ url: this.inputUrl });
+
+      var requestOptions = {
+        method: "POST",
+        headers: myHeaders,
+        body: raw,
+        redirect: "follow",
+      };
+
+      try {
+        this.showTableAdd = false;
+        let result = await fetch(
+          process.env.VUE_APP_API + "/api/admin/AddUrl",
+          requestOptions
+        );
+
+        let response = await result.text();
+        let responseModel = JSON.parse(response);
+
+        if (responseModel.code == 1002) {
+          this.urlShortener =
+            process.env.VUE_APP_API + "/" + responseModel.content.short_url;
+            let listUrls = [];
+            listUrls.push({
+              urlShortener: this.urlShortener,
+              inputUrl : this.inputUrl
+            });
+            this.listUrls = JSON.stringify(listUrls);
+            this.showTableAdd = true;
+          return;
+        }
+      } catch (err) {
+        console.log(err);
+      }
+    },
+  },
+};
+</script>
