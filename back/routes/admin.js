@@ -122,4 +122,26 @@ router.post('/bulkUrl', upload.single('file'), async function (req, res, next) {
     res.end();
 });
 
+router.get('/list', async function (req, res, next) {
+
+    let result = await adminTransaction.getAllUrls(req.mdb);
+
+    if (!result.err) {
+        let response = {
+            code: 1007,
+            messages: ['Correct'],
+            content: result.data
+        }
+
+        res.status(200);
+        res.json(response);
+        res.end();
+        return;
+    }
+
+    res.status(200);
+    res.json();
+    res.end();
+});
+
 module.exports = router;

@@ -107,4 +107,25 @@ exports.Db = function (db, mdb) {
             return resultTransaction;
         }
     }
+
+    this.getAllUrls = async function () {
+
+        try {
+            let query = {
+                obj: 1
+            }
+
+            let result = await db.collection(mdb.collection).find(query);
+
+            let documents = await result.toArray();
+
+            let resultTransaction = new baseBinding.resultTransaction(false, documents);
+
+            return resultTransaction;
+        }
+        catch (err) {
+            let resultTransaction = new baseBinding.resultTransaction(true, {});
+            return resultTransaction;
+        }
+    }
 }

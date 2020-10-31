@@ -71,11 +71,11 @@ exports.uploadBulk = async function (pathFile, mongodb) {
 
         let data = resultSaveBulk.data.ops;
 
-        for(let i=0;i<data.length;i++){
+        for (let i = 0; i < data.length; i++) {
 
             delete data[i].obj;
             delete data[i].created_date;
-            delete data[i]._id;   
+            delete data[i]._id;
         }
 
         let resultTransaction = new baseBinding.resultTransaction(false, data);
@@ -93,9 +93,35 @@ exports.uploadBulk = async function (pathFile, mongodb) {
     return resultReadFile;
 }
 
-exports.findShortCode = async function(shortCode,mongodb){
+exports.findShortCode = async function (shortCode, mongodb) {
 
     let resultFind = await mongodb.transactions.findShortCode(shortCode);
 
     return resultFind;
+}
+
+exports.getAllUrls = async function (mongodb) {
+
+    let result = await mongodb.transactions.getAllUrls();
+
+    if (!result.err) {
+        let documents = result.data;
+        let documents2 = [];
+
+        for (let i = 0; i < documents.length; i++) {
+            documents2.push({
+                short_code: documents[i].short_code,
+                url: documents[i].url
+            });
+        }
+
+        let resultTransaction = new baseBinding.resultTransaction(false, documents2);
+
+        return resultTransaction
+    }
+
+
+    let resultTransaction = new baseBinding.resultTransaction(true, {});
+
+    return resultTransaction;
 }
