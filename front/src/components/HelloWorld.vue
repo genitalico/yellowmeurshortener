@@ -2,6 +2,14 @@
   <div class="container">
     <h1 class="text-center">{{ name }}</h1>
     <div class="row">
+      <div class="col-1">
+        <h4>Bulk</h4>
+      </div>
+      <div class="col-1">
+        <b-form-checkbox id="checkbox-1" v-model="bulkMode" />
+      </div>
+    </div>
+    <div class="row" v-show="!bulkMode">
       <div class="col">
         <b-input-group prepend="URL" class="mt-3">
           <b-form-input v-model="inputUrl"></b-form-input>
@@ -14,40 +22,62 @@
       </div>
     </div>
 
+    <div class="row" v-show="bulkMode">
+      <div class="col">
+        <b-input-group>
+          <b-form-file
+            v-model="file"
+            :state="Boolean(file)"
+            placeholder="Subir archivo..."
+            drop-placeholder="Subir archivo..."
+          ></b-form-file>
+          <b-input-group-append>
+            <b-button variant="outline-success" v-on:click="bulkFile()"
+              >Subir</b-button
+            >
+          </b-input-group-append>
+        </b-input-group>
+      </div>
+    </div>
+
     <div class="row">
       <div class="col-6">
         <h3>Nuevas</h3>
-        <div class="col"><TableUrl v-if="showTableAdd" v-bind:list="listUrls" /></div>
+        <div class="col">
+          <TableUrl v-if="showTableAdd" v-bind:list="listUrls" />
+        </div>
       </div>
       <div class="col-6">
         <h3>Todas</h3>
-        <div class="col"><TableUrl v-if="showTableAdd" v-bind:list="listUrls" /></div>
+        <div class="col">
+          <TableUrl v-if="showTableAdd" v-bind:list="listUrls" />
+        </div>
       </div>
     </div>
   </div>
 </template>
 
 <script>
-import TableUrl from './TableUrls.vue'
+import TableUrl from "./TableUrls.vue";
 
 export default {
   name: "HelloWorld",
   props: {
     msg: String,
   },
-  components:{
-    TableUrl
+  components: {
+    TableUrl,
   },
-  mounted() {
-    
-  },
+  mounted() {},
   data() {
     return {
       name: "Url Shortener",
       inputUrl: "",
       urlShortener: "",
-      listUrls : '',
-      showTableAdd : false
+      listUrls: "",
+      showTableAdd: false,
+      bulkMode: false,
+      file: null,
     };
   },
   methods: {
@@ -77,17 +107,57 @@ export default {
         if (responseModel.code == 1002) {
           this.urlShortener =
             process.env.VUE_APP_API + "/" + responseModel.content.short_url;
-            let listUrls = [];
-            listUrls.push({
-              urlShortener: this.urlShortener,
-              inputUrl : this.inputUrl
-            });
-            this.listUrls = JSON.stringify(listUrls);
-            this.showTableAdd = true;
+          let listUrls = [];
+          listUrls.push({
+            urlShortener: this.urlShortener,
+            inputUrl: this.inputUrl,
+          });
+          this.listUrls = JSON.stringify(listUrls);
+          this.showTableAdd = true;
           return;
         }
       } catch (err) {
         console.log(err);
+      }
+    },
+    bulkFile: async function () {
+      if (this.file != null) {
+        var formdata = new FormData();
+        formdata.append("file", this.file, this.file.name);
+
+        var requestOptions = {
+          method: "POST",
+          body: formdata,
+          redirect: "follow",
+        };
+
+        try {
+          this.showTableAdd = false;
+          let result = await fetch(
+            process.env.VUE_APP_API + "/api/admin/bulkUrl",
+            requestOptions
+          );
+
+          let response = await result.text();
+
+          let responseModel = JSON.parse(response);
+
+          if (responseModel.code == 1002) {
+            let arr = responseModel.content;
+            let listUrls = [];
+            for (let i = 0; i < arr.length; i++) {
+              listUrls.push({
+                urlShortener: arr[i].short_code,
+                inputUrl: arr[i].url,
+              });
+            }
+            console.log(arr);
+            this.listUrls = JSON.stringify(listUrls);
+            this.showTableAdd = true;
+          }
+        } catch (err) {
+          console.log(err);
+        }
       }
     },
   },
