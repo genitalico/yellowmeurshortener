@@ -15,7 +15,7 @@ router.get('/', function (req, res, next) {
 
 });
 
-router.post('/newurl', async function (req, res, next) {
+router.post('/AddUrl', async function (req, res, next) {
 
     let body = req.body;
     try {

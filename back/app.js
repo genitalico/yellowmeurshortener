@@ -20,6 +20,6 @@ app.use(connection.connection(app, {}));
 
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
-app.use('/admin', adminRouter);
+app.use('/api/admin', adminRouter);
 
 module.exports = app;
