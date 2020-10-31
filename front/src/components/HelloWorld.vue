@@ -50,7 +50,7 @@
       <div class="col-6">
         <h3>Todas</h3>
         <div class="col">
-          <TableUrl v-if="showTableAdd" v-bind:list="listUrls" />
+          <TableUrl v-if="showTableAll" v-bind:list="listUrlsAll" />
         </div>
       </div>
     </div>
@@ -68,7 +68,9 @@ export default {
   components: {
     TableUrl,
   },
-  mounted() {},
+  async mounted() {
+    await this.getAllUrls();
+  },
   data() {
     return {
       name: "Url Shortener",
@@ -78,6 +80,8 @@ export default {
       showTableAdd: false,
       bulkMode: false,
       file: null,
+      listUrlsAll: "[]",
+      showTableAll: false,
     };
   },
   methods: {
@@ -114,6 +118,9 @@ export default {
           });
           this.listUrls = JSON.stringify(listUrls);
           this.showTableAdd = true;
+
+          await this.getAllUrls();
+
           return;
         }
       } catch (err) {
@@ -151,13 +158,47 @@ export default {
                 inputUrl: arr[i].url,
               });
             }
-            console.log(arr);
             this.listUrls = JSON.stringify(listUrls);
             this.showTableAdd = true;
+
+            await this.getAllUrls();
           }
         } catch (err) {
           console.log(err);
         }
+      }
+    },
+    getAllUrls: async function () {
+      try {
+        this.showTableAll = false;
+        var requestOptions = {
+          method: "GET",
+          redirect: "follow",
+        };
+
+        let result = await fetch(
+          process.env.VUE_APP_API + "/api/admin/list",
+          requestOptions
+        );
+        let response = await result.text();
+        let responseModel = JSON.parse(response);
+
+        if (responseModel.code == 1007) {
+          let listUrls = [];
+          let arr = responseModel.content;
+          for (let i = 0; i < arr.length; i++) {
+            listUrls.push({
+              urlShortener: process.env.VUE_APP_API + "/" + arr[i].short_code,
+              inputUrl: arr[i].url,
+            });
+          }
+
+          
+          this.listUrlsAll = JSON.stringify(listUrls);
+          this.showTableAll = true;
+        }
+      } catch (err) {
+        console.log(err);
       }
     },
   },
