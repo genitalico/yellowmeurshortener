@@ -154,7 +154,7 @@ export default {
             let listUrls = [];
             for (let i = 0; i < arr.length; i++) {
               listUrls.push({
-                urlShortener: arr[i].short_code,
+                urlShortener: process.env.VUE_APP_API + arr[i].short_url,
                 inputUrl: arr[i].url,
               });
             }
@@ -188,7 +188,7 @@ export default {
           let arr = responseModel.content;
           for (let i = 0; i < arr.length; i++) {
             listUrls.push({
-              urlShortener: process.env.VUE_APP_API + "/" + arr[i].short_code,
+              urlShortener: process.env.VUE_APP_API + "/" + arr[i].short_url,
               inputUrl: arr[i].url,
             });
           }

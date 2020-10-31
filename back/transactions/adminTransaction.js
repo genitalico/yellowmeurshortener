@@ -71,14 +71,18 @@ exports.uploadBulk = async function (pathFile, mongodb) {
 
         let data = resultSaveBulk.data.ops;
 
+        let data2 = [];
+
         for (let i = 0; i < data.length; i++) {
 
-            delete data[i].obj;
-            delete data[i].created_date;
-            delete data[i]._id;
+            let d = {
+                short_url : data[i].short_code,
+                url : data[i].url
+            };
+            data2.push(d);
         }
 
-        let resultTransaction = new baseBinding.resultTransaction(false, data);
+        let resultTransaction = new baseBinding.resultTransaction(false, data2);
 
         return resultTransaction;
     }
@@ -110,7 +114,7 @@ exports.getAllUrls = async function (mongodb) {
 
         for (let i = 0; i < documents.length; i++) {
             documents2.push({
-                short_code: documents[i].short_code,
+                short_url: documents[i].short_code,
                 url: documents[i].url
             });
         }
